@@ -1,38 +1,52 @@
-# PicoSense
-A minimal IoT weather station built on the Raspberry Pi Pico W for learning embedded systems, Wi-Fi networking, HTTP APIs, MQTT, Linux infrastructure.
+# Pico IoT Security Lab
 
-## What is PicoSense?
+This is an isolated IoT security research testbed based on the Raspberry Pi Pico W. This project simulates an IoT device to evaluate attack surfaces, analyze firmware vulnerabilities, capture network traffic, and test hardening strategies across HTTP, MQTT, and firmware layers.
 
-PicoSense is an IoT device built on Raspberry Pi Pico W.
 
-The goal is to build a device that can eventually:
-- Measure temperature
-- Measure ambient light
-- Report device status
-- Report uptime
-- Report firmware version
-- Identify itself with a unique device ID
-- Accept commands
-- Connect to Wi-Fi
-- Expose a small HTTP API
-- Publish telemetry using MQTT
-- Receive commands over MQTT
-- Communicate securely using TLS
+## Summary
 
-## Tech Stack
-### Hardware
-- Raspberry Pi Pico W
-- BH1750 (ambient light sensor)
+The primary objective of this project is to analyze embedded security methodology from an attacker and defense perspective. I use this project as an learning experience for IoT security concepts by investigating credential exposure, plaintext telemetry, unauthenticated commands, and firmware binary analysis.
+* **Hardware Target**: Raspberry Pi Pico W running custom MicroPython firmware.
+* **Infrastructure**: Isolated LAN, Proxmox VM hosting Mosquitto MQTT broker, Fedora Linux workstation.
 
-### Software
-- MicroPython
+## Lab Architecture
+                        ┌─────────────────────────┐
+                        │ Fedora Workstation      │
+                        │ (Analyst)               │
+                        └────────────┬────────────┘
+                                     │
+                               Wi-Fi / LAN
+                                     │
+            ┌────────────────────────┴────────────────────────┐
+            │                                                 │
+    ┌───────▼────────────────┐               ┌────────────────▼───────────────┐
+    │ Pico W Target          │   MQTT/HTTP   │ Proxmox VM                     │
+    │ - HTTP API             ├───────────────► Mosquitto MQTT Broker          │
+    │ - Telemetry Publisher  │               │ Logging & Security Controls    │
+    └────────────────────────┘               └────────────────────────────────┘
 
-### Infrastructure
-- Linux(Fedora) as main machine.
 
-## Roadmap
 
-- [ ] **Phase 0:** Hardware selection & architecture specification
-- [ ] **Phase 1:** Firmware base, Wi-Fi connectivity, and serial debugging
-- [ ] **Phase 2:** Local HTTP REST API 
-- [ ] **Phase 3:** Integration with MQTT broker for telemetry pub/sub
+Detailed architectural diagrams and interface specifications can be found in [`Docs/architecture.md`](Docs/architecture.md).
+
+## Findings & Vulnerability Index
+
+Each vulnerability identified in this testbed is documented with root-cause analysis and remediation steps:
+
+| Finding ID | Vulnerability Focus | Document Link |
+| :--- | :--- | :--- |
+| **PICO-FW-001** | Credential Exposure | [`PICO-FW-001.md`](Findings/PICO-FW-001.md) |
+| **PICO-HTTP-001** | Unauthenticated Command Execution | [`PICO-HTTP-001.md`](Findings/PICO-HTTP-001.md) |
+| **PICO-HTTP-002** | Input Validation | [`PICO-HTTP-002.md`](Findings/PICO-HTTP-002.md) |
+| **PICO-MQTT-001** | Missing Broker Access Control Lists | [`PICO-MQTT-001.md`](Findings/PICO-MQTT-001.md) |
+| **PICO-MQTT-002** | Plaintext Message Transmission | [`PICO-MQTT-002.md`](Findings/PICO-MQTT-002.md) |
+
+---
+
+## Project Structure & Documentation
+
+* [`Docs/Setup.md`](Docs/Setup.md): Instructions for setting up the hardware, VM, and isolated network.
+* [`Docs/Threat-Model.md`](Docs/Threat-Model.md): Attacker profiles, boundaries, and objective definitions.
+* [`Docs/api.md`](Docs/api.md): Endpoint descriptions for both vulnerable and hardened device versions.
+* [`Docs/MQTT_Setup.md`](Docs/MQTT_Setup.md): Broker configuration, access rules, and TLS setup.
+* [`Debugging/MQTT.md`](Debugging/MQTT.md): Hardware, serial console, and broker troubleshooting notes.
