@@ -2,16 +2,30 @@
 
 ## Issue
 
-Anyone can send data to and from the pico via the HTTP API.
+Device information readable without authentication
 
 ## Impact
 
-An attacker can send unwanted commands to the pico and tap into the communication between the pico and its users using the Wireshark tool.
+Sensitive data like temperature, uptime exposed to anyone on network
 
 ## Root cause
 
-The cause is that there is no authentication between pico and the user sending and receiving data, meaning any person connected to the network can send and receive commands.
+No authentication on GET /status
 
 ## Remediation
 
-To prevent such attacks, we can add authentication (such as asking for a password) such that only the users who know the password can receive and send the commands. One further addition we can do is that creating two different passwords like one for only receiving messages and the other for only sending commands.
+Require authentication to access device data
+
+## Evidence
+
+**Method:**
+```bash
+curl http://<pico_ipaddr>/status
+```
+
+**Result:**
+```json
+{"uptime": 80215, "device": "picosense-01", "Temperature": 32.193984}
+```
+
+**Conclusion:** Device information returned without any authentication required.
