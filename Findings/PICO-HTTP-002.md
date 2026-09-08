@@ -12,3 +12,17 @@ There is no authentication for the HTTP request sender.
 ## Remediation:
 Create authentication such that only the person authorised can change the data.
 
+## Evidence
+
+**Method:**
+```bash
+curl -X POST http://<pico-ip>/config -d '{"interval": 30}'
+```
+
+**Result:**
+
+```json
+{"Interval": 30}
+```
+
+**Conclusion:** Device information changed without any authentication required.
