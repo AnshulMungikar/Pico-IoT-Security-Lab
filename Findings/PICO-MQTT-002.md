@@ -29,4 +29,4 @@ The following data was visible in plaintext:
 
 
 **Conclusion:**
-With this information a person a attacker can send their own messages which defeats the whole point of authentication. 
+With this information an attacker can send their own messages which defeats the whole point of authentication. 
