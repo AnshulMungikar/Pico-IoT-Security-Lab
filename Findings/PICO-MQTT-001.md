@@ -25,3 +25,24 @@ LED turns on.
 ```
 
 Conclusion: Messages can be sent without any authentication required.
+
+## Authentication
+1. Created Mosquitto password file:
+```bash
+mosquitto_passwd -c /etc/mosquitto/passwd root
+```
+
+2. Updated `/etc/mosquitto/mosquitto.conf`:
+```
+allow_anonymous false
+password_file /etc/mosquitto/passwd
+```
+
+3. Updated Pico firmware to connect with credentials:
+```python
+client = MQTTClient('picosense-01', '<broker-ip>', port=1883, user='<MQTT_user>', password='<password>')
+```
+
+4. Verified fix — unauthorized connection now returns:
+
+`Connection Refused: not authorised`
