@@ -32,10 +32,26 @@ print('Listening on port 80')
 
 
 #MQTT
-client = MQTTClient('picosense-02', '192.168.1.127', port=1883)
+client = MQTTClient('picosense-01', '1<BROKER _IP>', port=1883, user='<USER>', password='<PASSWORD>')
 client.connect()
 client.publish('picosense/01/telemetry', response)
 
+#MQTT recieve command
+def mqtt_callback(topic, msg):
+        data1 = json.loads(msg)
+        command = data1['command']
+        if command == "LED_ON":
+            led.on()
+            print("LED turned on")
+        elif command == "LED_OFF":
+            led.off()
+            print("LED turned off")
+        elif command == "REBOOT":
+            machine.reset()
+            print("Device rebooting")
+
+client.set_callback(mqtt_callback)
+client.subscribe('picosense/01/command')
 
 
 
@@ -78,8 +94,14 @@ while True:
         elif b"config" in request:
             print(interval)
             conn.send('HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n' + config_response)    
+
+        elif b"command" in request:
+            conn.send('HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{"commands": ["LED_ON", "LED_OFF", "REBOOT"]}')
+            print("hello")
+
         else:
             conn.send('HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nNot Found')
+            
         conn.close()
     
     except OSError:
@@ -91,4 +113,5 @@ while True:
     temperature = 27 - (reading - 0.706) / 0.001721
     response = json.dumps({"device": "picosense-01", "uptime": time.ticks_ms() // 1000, "Temperature": temperature})
     client.publish('picosense/01/telemetry', response)
-    sleep(10)
+    client.check_msg()
+    sleep(1)
