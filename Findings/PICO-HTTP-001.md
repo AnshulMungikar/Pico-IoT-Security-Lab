@@ -41,6 +41,17 @@ Result: The following data was visible in plaintext:
 Screenshots:
 ![HTTP_status_capture](./Screenshots/HTTP_STATUS_WIRESHARK.png)
 
+## Remediation Applied
+HTTP Basic Authentication implemented (in the secure branch). Requests without valid credentials now receive a 401 Unauthorized response.
+
+Verified:
+- Without credentials: 401 Unauthorized
+<img width="525" height="72" alt="image" src="https://github.com/user-attachments/assets/b5f4e831-e661-4bd4-bf90-e817c4330621" />
+
+- With credentials: 200 OK
+<img width="1632" height="110" alt="image" src="https://github.com/user-attachments/assets/06146a0a-5c62-442c-a475-42d71edd8449" />
+
+
 ## **Conclusion:** 
 While device data is accessible via curl to anyone on the network, Wireshark demonstrates that even a passive observer — without making any requests — can intercept and read all HTTP traffic including device telemetry.
 
