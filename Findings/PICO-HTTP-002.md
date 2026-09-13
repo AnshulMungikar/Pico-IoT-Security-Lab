@@ -25,4 +25,14 @@ curl -X POST http://<pico-ip>/config -d '{"interval": 30}'
 {"Interval": 30}
 ```
 
-**Conclusion:** Device information changed without any authentication required.
+## Remediation Applied
+HTTP Basic Authentication implemented. Requests without valid credentials now receive a 401 Unauthorized response.
+
+Verified:
+- Without credentials: 401 Unauthorized
+- With credentials: 200 OK
+<img width="1926" height="232" alt="image" src="https://github.com/user-attachments/assets/58faec82-c2e4-43f8-a475-ff738e9ac942" />
+
+
+## **Conclusion:** 
+Device information can not be changed without any authentication.
