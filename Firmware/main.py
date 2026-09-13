@@ -7,6 +7,7 @@ from time import sleep
 from machine import Pin
 import machine
 from umqtt.simple import MQTTClient
+import binascii
 
 
 led = Pin("LED", Pin.OUT)
@@ -32,7 +33,7 @@ print('Listening on port 80')
 
 
 #MQTT
-client = MQTTClient('picosense-01', '1<BROKER _IP>', port=1883, user='<USER>', password='<PASSWORD>')
+client = MQTTClient('picosense-02', '192.168.1.127', port=1883, user='admin', password='anshulmungikar')
 client.connect()
 client.publish('picosense/01/telemetry', response)
 
@@ -55,6 +56,15 @@ client.subscribe('picosense/01/command')
 
 
 
+def check_auth(request):
+    if b"Authorization" not in request:
+        return False
+    encoded = request.split(b'Basic ')[1].strip()
+    decoded = binascii.a2b_base64(encoded)
+    credentials = decoded.decode('utf-8')
+    user, password = credentials.split(':')
+    return user == "admin" and password == "admin"
+
 
 
 s.settimeout(1)
@@ -62,6 +72,12 @@ while True:
     try:
         conn, addr = s.accept()
         request = conn.recv(1024)
+
+
+        if not check_auth(request):
+            conn.send('HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm="PicoSense"\r\nContent-Type: text/plain\r\n\r\nUnauthorized')
+            conn.close()
+            continue
 
         if b"status" in request:
             print(request)
