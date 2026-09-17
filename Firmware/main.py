@@ -8,12 +8,16 @@ from machine import Pin
 import machine
 from umqtt.simple import MQTTClient
 import binascii
+import ssl
 
 
+# led config
 led = Pin("LED", Pin.OUT)
+
 
 interval = 10
 config_response = json.dumps({"Interval": interval})
+
 
 #CPU Temperature
 sensor_temp = ADC(4)
@@ -32,10 +36,14 @@ s.listen(1)
 print('Listening on port 80')
 
 
-#MQTT
-client = MQTTClient('picosense-02', '192.168.1.127', port=1883, user='admin', password='anshulmungikar')
+#MQTT setup
+client = MQTTClient('test', '192.168.1.127', port=8883, 
+                    user='admin', password='<MQTT_password>',
+                    ssl=True, 
+                    ssl_params={"server_hostname": "<Broker_IP>"})
 client.connect()
 client.publish('picosense/01/telemetry', response)
+
 
 #MQTT recieve command
 def mqtt_callback(topic, msg):
@@ -55,7 +63,7 @@ client.set_callback(mqtt_callback)
 client.subscribe('picosense/01/command')
 
 
-
+# For HTTP check if the password is correct or not
 def check_auth(request):
     if b"Authorization" not in request:
         return False
